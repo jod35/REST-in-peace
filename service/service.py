@@ -33,3 +33,50 @@ notification_fields={
 }
 
 notification_manager=NotificationManager()
+
+class Notification(Resource):
+    def abort_if_notification_not_found(self,id):
+        if id not in notification_manager.notiications:
+            abort(HttpStatus.not_found_404.value,
+                  message="Notification {0} doesnot exist".format(id))
+
+    @marshal_with(notification_fields)
+    def get(self,id):
+        self.abort_if_notification_not_found(id)
+        return notification_manager.get_notification(id)
+
+    def delete(self,id):
+        self.abort_if_notification_not_found(id)
+        notification_manager.delete_notifications(id)
+        return "",HttpStatus.no_content_204.value
+
+
+    @marshal_with(notification_fields)
+    def path(self,id):
+        self.abort_if_notification_not_found(id)
+        notification=notification_manager.get_notification(id)
+        parser=reqparse.RequestParser()
+        parser.add_argument('message',type=str)
+        parser.add_argument('ttl',type=int)
+        parser.add_argument('displayed_times',types=int)
+        parser.add_argument('displayed_once',type=bool)
+        args=parser.parse_args()
+        print(args)
+
+        if 'message' in args and args['message'] is not None:
+            notification['message']=args['messages']
+
+        if 'ttl' in args and args['ttl'] is not None:
+            notification['ttl']=args['ttl']
+
+        if 'displayed_times' in args and args['displayed_times'] is not None:
+            notification['displayed_times']=args['displayed_times']
+
+        if 'displayed_once' in args and args['displayed_once'] is not None:
+            notification['displayed_times']=args['displayed_times']
+
+
+class NotificationList(Resource):
+    @marshal_with(notification_fields)
+    def get(self,id):
+        parser=req
