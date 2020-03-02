@@ -79,4 +79,8 @@ class Notification(Resource):
 class NotificationList(Resource):
     @marshal_with(notification_fields)
     def get(self,id):
-        parser=req
+        parser=reqparse.RequestParsr()
+        parser.add_argument('message',type=str,required=True,help="Message cannot bre blank")
+        parser.add_argument('ttl',type=int,required=True,help="Time to leave cannot be blank")
+        parser.add_argument('notification category',type=str,required=True,help="Notification Category cannot left empty")
+        args=parser.parse_args()
